@@ -1,18 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # =============================================================================
-"""Start app"""
+"""Create db for project"""
 # =============================================================================
 # Imports
 # =============================================================================
-from filmBook import app
+from filmBook import db
 
-
-@app.route('/')
-def hello_world():  # put application's code here
-    """Temple route"""
-    return 'Hello World!'
-
-
-if __name__ == '__main__':
-    app.run()
+db.create_all()
