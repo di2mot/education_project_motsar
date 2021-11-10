@@ -7,6 +7,7 @@
 # =============================================================================
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
+# from filmBook import routes
 
 
 # Constants
@@ -20,5 +21,8 @@ CONF_KEY = "SQLALCHEMY_DATABASE_URI"
 
 # Connecting
 app = Flask(__name__)
+from filmBook import routes
+
 app.config[CONF_KEY] = f'{DIALECT}+{DRIVER}://{LOGIN}:{PASS}@{HOST}/{DBNAME}'
 db = SQLAlchemy(app)
+
