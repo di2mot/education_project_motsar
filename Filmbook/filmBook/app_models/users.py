@@ -18,7 +18,7 @@ class Users(db.Model):
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(120), unique=False, nullable=False)
 
-    def __init__(self, nickname, email, password):
+    def __init__(self, nickname: str, email: str, password: str):
         self.nickname = nickname
         self.email = email
         self.password = password

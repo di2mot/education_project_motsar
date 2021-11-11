@@ -5,9 +5,10 @@
 # =============================================================================
 # Imports
 # =============================================================================
+from datetime import datetime
 from filmBook import db
-from associatin_tables import films_directors
-from associatin_tables import films_genres
+from filmBook.app_models.associatin_tables import films_directors
+from filmBook.app_models.associatin_tables import films_genres
 
 class Films(db.Model):
     """Main film table"""
@@ -32,7 +33,8 @@ class Films(db.Model):
         'films', secondary=films_directors, lazy='subquery',
         backref=db.backref('directors', lazy=True))
 
-    def __init__(self, film_name, rateds_rated_id, poster_url, release_date, rating, user_added):
+    def __init__(self, film_name: str, rateds_rated_id: int, poster_url: str,
+                 release_date: datetime, rating: int, user_added: int):
         self.film_name = film_name
         self.rateds_rated_id = rateds_rated_id
         self.poster_url = poster_url

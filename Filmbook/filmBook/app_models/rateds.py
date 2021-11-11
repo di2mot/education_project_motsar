@@ -14,7 +14,7 @@ class Rateds(db.Model):
     rated_id = db.Column(db.Integer, primary_key=True)
     rated = db.Column(db.String(5), unique=True, nullable=False)
 
-    def __init__(self, rated):
+    def __init__(self, rated: str):
         self.rated = rated
 
     def __repr__(self):

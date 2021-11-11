@@ -1,28 +1,22 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # =============================================================================
-"""Init for Filmbook app project"""
+"""Init for FilmBook app project"""
 # =============================================================================
 # Imports
 # =============================================================================
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
-# from filmBook import routes
-
-
-# Constants
-DBNAME = "filmbook"
-DIALECT = "postgresql"
-DRIVER = "psycopg2"
-LOGIN = "postgres"
-PASS = "changeme"
-HOST = "localhost"
-CONF_KEY = "SQLALCHEMY_DATABASE_URI"
+from flask_migrate import Migrate
+from config import Config
 
 # Connecting
 app = Flask(__name__)
-from filmBook import routes
 
-app.config[CONF_KEY] = f'{DIALECT}+{DRIVER}://{LOGIN}:{PASS}@{HOST}/{DBNAME}'
+app.config.from_object(Config)
 db = SQLAlchemy(app)
 
+migrate = Migrate(app, db)
+
+# Import routes and models
+from filmBook import routes, models
