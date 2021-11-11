@@ -5,13 +5,14 @@
 # =============================================================================
 # Imports
 # =============================================================================
-from filmBook import app
 from flask import render_template
+from filmBook import app
 
 
 @app.route('/')
 @app.route('/index')
 def index():
     """Rout for index.html"""
-    user = {'username': 'Miguel'}
+
+    user = {'username': 'Dima'}
     return render_template('index.html', title='FilmBook', user=user)
