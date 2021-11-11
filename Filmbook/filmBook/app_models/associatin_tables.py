@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 # =============================================================================
-"""Database app_models classes for Filmbook app"""
+"""Association table for tables table films, table directors, table  genres"""
 # =============================================================================
 # Imports
 # =============================================================================

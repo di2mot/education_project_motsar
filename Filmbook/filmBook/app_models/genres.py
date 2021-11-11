@@ -6,7 +6,7 @@
 # Imports
 # =============================================================================
 from filmBook import db
-from associatin_tables import films_genres
+from filmBook.app_models.associatin_tables import films_genres
 
 
 class Genres(db.Model):
@@ -18,7 +18,7 @@ class Genres(db.Model):
     film = db.relationship('films', secondary=films_genres, lazy='subquery',
                            backref=db.backref('genres', lazy=True))
 
-    def __init__(self, genre):
+    def __init__(self, genre: str):
         self.genre = genre
 
     def __repr__(self):
