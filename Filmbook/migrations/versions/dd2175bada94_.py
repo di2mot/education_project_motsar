@@ -1,8 +1,8 @@
 """empty message
 
-Revision ID: d69f6b28df26
-Revises: c78a4240268d
-Create Date: 2021-11-11 15:00:39.896609
+Revision ID: dd2175bada94
+Revises: 
+Create Date: 2021-11-12 15:26:25.169712
 
 """
 from alembic import op
@@ -10,8 +10,8 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'd69f6b28df26'
-down_revision = 'c78a4240268d'
+revision = 'dd2175bada94'
+down_revision = None
 branch_labels = None
 depends_on = None
 
@@ -22,9 +22,7 @@ def upgrade():
     sa.Column('director_id', sa.Integer(), nullable=False),
     sa.Column('first_name', sa.String(length=20), nullable=False),
     sa.Column('second_name', sa.String(length=20), nullable=False),
-    sa.PrimaryKeyConstraint('director_id'),
-    sa.UniqueConstraint('first_name'),
-    sa.UniqueConstraint('second_name')
+    sa.PrimaryKeyConstraint('director_id')
     )
     op.create_table('genres',
     sa.Column('genre_id', sa.Integer(), nullable=False),
@@ -34,9 +32,18 @@ def upgrade():
     )
     op.create_table('rateds',
     sa.Column('rated_id', sa.Integer(), nullable=False),
-    sa.Column('rated', sa.String(length=5), nullable=False),
+    sa.Column('rated', sa.String(length=20), nullable=False),
     sa.PrimaryKeyConstraint('rated_id'),
     sa.UniqueConstraint('rated')
+    )
+    op.create_table('users',
+    sa.Column('user_id', sa.Integer(), nullable=False),
+    sa.Column('nickname', sa.String(length=20), nullable=False),
+    sa.Column('email', sa.String(length=120), nullable=False),
+    sa.Column('password', sa.String(length=120), nullable=False),
+    sa.PrimaryKeyConstraint('user_id'),
+    sa.UniqueConstraint('email'),
+    sa.UniqueConstraint('nickname')
     )
     op.create_table('films',
     sa.Column('film_id', sa.Integer(), nullable=False),
@@ -82,6 +89,7 @@ def downgrade():
     op.drop_index(op.f('ix_films_film_name'), table_name='films')
     op.drop_index(op.f('ix_films_description'), table_name='films')
     op.drop_table('films')
+    op.drop_table('users')
     op.drop_table('rateds')
     op.drop_table('genres')
     op.drop_table('directors')

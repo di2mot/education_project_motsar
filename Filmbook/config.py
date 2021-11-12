@@ -6,8 +6,6 @@
 # Imports
 # =============================================================================
 
-import os
-basedir = os.path.abspath(os.path.dirname(__file__))
 
 
 class Config:
@@ -16,15 +14,19 @@ class Config:
     # For postgres
     db_name = "filmbook"
     dialect = "postgresql"
-    driver = "psycopg2"
+    # work only  pg8000
+    driver = "pg8000"
     login = "postgres"
-    passw = "changeme"
+    passw = "postgres_password"
     host = "localhost"
 
     # For SQLite
-    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
-        'sqlite:///' + os.path.join(basedir, 'filmbook.db')
+    # import os
+    # basedir = os.path.abspath(os.path.dirname(__file__))
+    # SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or \
+    #     'sqlite:///' + os.path.join(basedir, 'filmbook.db')
+
     SQLALCHEMY_TRACK_MODIFICATIONS = False
 
     # For postgres
-    # SQLALCHEMY_DATABASE_URI = f'{DIALECT}+{driver}://{login}:{passw}@{host}/{db_name}'
+    SQLALCHEMY_DATABASE_URI = f'{dialect}+{driver}://{login}:{passw}@{host}/{db_name}'
