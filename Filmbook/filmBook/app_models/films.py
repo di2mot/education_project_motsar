@@ -5,7 +5,7 @@
 # =============================================================================
 # Imports
 # =============================================================================
-from datetime import datetime
+from datetime import date
 from filmBook import db
 from filmBook.app_models.associatin_tables import films_directors
 from filmBook.app_models.associatin_tables import films_genres
@@ -21,25 +21,27 @@ class Films(db.Model):
         unique=False, nullable=False)
     poster_url = db.Column(db.Text, unique=True, nullable=False)
     release_date = db.Column(db.Date, unique=False, nullable=False, index=True)
-    rating = db.Column(db.Integer, unique=False, nullable=False, index=True)
+    rating = db.Column(db.Float, unique=False, nullable=False, index=True)
     description = db.Column(db.Text, unique=False, index=True)
     user_added = db.Column(db.Integer, db.ForeignKey('users.user_id'))
 
     # for association
     film_genr = db.relationship(
-        'films', secondary=films_genres, lazy='subquery',
-        backref=db.backref('genres', lazy=True))
+        'Genres', secondary=films_genres, lazy='subquery',
+        backref=db.backref('films', lazy=True))
+
     film_direc = db.relationship(
-        'films', secondary=films_directors, lazy='subquery',
-        backref=db.backref('directors', lazy=True))
+        'Directors', secondary=films_directors, lazy='subquery',
+        backref=db.backref('films', lazy=True))
 
     def __init__(self, film_name: str, rateds_rated_id: int, poster_url: str,
-                 release_date: datetime, rating: int, user_added: int):
+                 release_date: str, rating: float, description: str, user_added=None):
         self.film_name = film_name
         self.rateds_rated_id = rateds_rated_id
         self.poster_url = poster_url
         self.release_date = release_date
         self.rating = rating
+        self.description = description
         self.user_added = user_added
 
     def __repr__(self):

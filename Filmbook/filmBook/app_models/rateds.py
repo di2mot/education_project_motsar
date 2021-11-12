@@ -12,7 +12,7 @@ class Rateds(db.Model):
 
     __tablename__ = 'rateds'
     rated_id = db.Column(db.Integer, primary_key=True)
-    rated = db.Column(db.String(5), unique=True, nullable=False)
+    rated = db.Column(db.String(20), unique=True, nullable=False)
 
     def __init__(self, rated: str):
         self.rated = rated
