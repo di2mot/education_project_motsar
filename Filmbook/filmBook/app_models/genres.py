@@ -6,7 +6,6 @@
 # Imports
 # =============================================================================
 from filmBook import db
-from filmBook.app_models.associatin_tables import films_genres
 
 
 class Genres(db.Model):
@@ -15,8 +14,6 @@ class Genres(db.Model):
     __tablename__ = 'genres'
     genre_id = db.Column(db.Integer, primary_key=True)
     genre = db.Column(db.String(20), unique=True, nullable=False)
-    film = db.relationship('films', secondary=films_genres, lazy='subquery',
-                           backref=db.backref('genres', lazy=True))
 
     def __init__(self, genre: str):
         self.genre = genre
