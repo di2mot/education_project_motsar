@@ -10,10 +10,8 @@ from filmBook import db
 # Association table for table films and table directors
 films_directors = db.Table(
     'films_directors',
-    db.Column('films_film_id', db.Integer,
-                db.ForeignKey('films.film_id')),
-    db.Column('directors_director_id', db.Integer,
-                db.ForeignKey('directors.director_id'))
+    db.Column('films_film_id', db.Integer, db.ForeignKey('films.film_id')),
+    db.Column('directors_director_id', db.Integer, db.ForeignKey('directors.director_id'))
     )
 
 # Association table for table films and table genres
