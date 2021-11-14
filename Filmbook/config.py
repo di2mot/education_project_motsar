@@ -15,7 +15,7 @@ class Config:
     db_name = "filmbook"
     dialect = "postgresql"
     # work only  pg8000
-    driver = "pg8000"
+    driver = "psycopg2"
     login = "postgres"
     passw = "postgres_password"
     host = "localhost"
