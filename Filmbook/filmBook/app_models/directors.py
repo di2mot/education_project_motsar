@@ -16,8 +16,13 @@ class Directors(db.Model):
     director_id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(40), unique=True, nullable=False)
     film_direc = db.relationship(
-        'Films', secondary=films_directors, lazy='subquery',
-        backref=db.backref('dir_films', lazy=True))
+                                'Films',
+                                secondary=films_directors,
+                                backref=db.backref(
+                                                    'dir_films',
+                                                    lazy='joined'),
+                                passive_deletes=True,
+                                cascade='all, delete')
 
     def __init__(self, name: str):
         self.name = name
