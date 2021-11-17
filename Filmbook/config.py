@@ -14,7 +14,7 @@ class Config:
     # For postgres
     db_name = "filmbook"
     dialect = "postgresql"
-    # work only  pg8000
+    # if not work, use  pg8000
     driver = "psycopg2"
     login = "postgres"
     passw = "postgres_password"
@@ -27,6 +27,7 @@ class Config:
     #     'sqlite:///' + os.path.join(basedir, 'filmbook.db')
 
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+    SECRET_KEY = 'DEV'
 
     # For postgres
     SQLALCHEMY_DATABASE_URI = f'{dialect}+{driver}://{login}:{passw}@{host}/{db_name}'
