@@ -12,7 +12,7 @@ from filmBook.models import Directors
 from filmBook.models import Users
 from filmBook.models import films_genres
 from filmBook.models import films_directors
-from filmBook import db
+from filmBook import db, app
 from datetime import date
 
 
@@ -23,7 +23,8 @@ def get_user_id(nickname: str) -> int:
     """
 
     if not isinstance(nickname, str):
-        raise TypeError(f'Type nickname must bi <class "str"> not {type(nickname)}')
+        error = f"TypeError: Type nickname must bi <class 'str'> not {type(nickname)}"
+        app.logger.error(f"location:'get_user_id' {error}")
 
     user_id = Users.query.filter_by(nickname=nickname).first()
 
@@ -39,7 +40,8 @@ def get_user_nickname(user_id: int) -> str:
     """
 
     if not isinstance(user_id, int):
-        return f'TypeError: Type id must be <class "int"> not {type(user_id)}'
+        error = f'TypeError: Type id must be <class "int"> not {type(user_id)}'
+        app.logger.error(f"location:'get_user_nickname' {error}")
 
     user_nick = Users.query.get(user_id)
 
@@ -52,20 +54,24 @@ def get_user_auth(nickname: str, password: str) -> dict:
     Input: int - id of user from table users.id
     Output: str - nickname of user from table users.nickname
     """
+    user = None
     error = None
     status = False
 
     if not isinstance(nickname, str):
         error = f'TypeError: Type "nickname" must be <class "str"> not {type(nickname)}'
-    if not isinstance(password, str):
+    elif not isinstance(password, str):
         error = f'TypeError: Type "password" must be <class "str"> not {type(password)}'
-
-    user = Users.query.filter_by(nickname=nickname).first()
-    if user is not None:
-        if password == user.password:
-            status = True
     else:
-        error = f'LoginError: User {nickname} not find. For registration: /registration1 '
+        app.logger.error(f"get_user_auth:'get_user_nickname' {error}")
+
+        user = Users.query.filter_by(nickname=nickname).first()
+        if user is not None:
+            if password == user.password:
+                status = True
+        else:
+            error = f'LoginError: User {nickname} not find. For registration: /registration1 '
+        app.logger.error(f"get_user_auth:'get_user_nickname' {error}")
 
     return {'user': user, 'message': {'error': error, 'status': status}}
 
@@ -75,13 +81,16 @@ def get_user_password(user_id: str) -> str:
     Input: int - id of user from table users.id
     Output: str - nickname of user from table users.nickname
     """
-
+    res = False
     if not isinstance(user_id, int):
-        return f'TypeError:Type id must bi <class "int"> not {type(user_id)}'
+        error = f'TypeError:Type id must bi <class "int"> not {type(user_id)}'
+        app.logger.error(f"get_user_auth:'get_user_nickname' {error}")
 
-    user_pass = Users.get(user_id)
+    else:
+        user_pass = Users.get(user_id)
+        res = user_pass.password
 
-    return user_pass.password
+    return res
 
 
 def add_new_user(nickname: str, email: str, password: str) -> str:
@@ -94,21 +103,21 @@ def add_new_user(nickname: str, email: str, password: str) -> str:
     If there is an error in user input, it returns an exception with a description of the error."""
 
     # Check correct input
-    if not isinstance(nickname, str):
-        return f'TypeError: nickname type must be <class "str", not {type(nickname)}>'
-    if not isinstance(email, str):
-        return f'TypeError: email type must be <class "str", not {type(email)}>'
-    if not isinstance(password, str):
-        return f'TypeError: password type must be <class "str", not {type(password)}>'
-    if not 3 <= len(nickname) <= 20:
-        return 'ValueError: nickname length must be between 3 and 20 characters, ' \
-               f'you nickname length={len(nickname)}'
-    if not 5 <= len(email) <= 20:
-        return 'ValueError: email length must be between 5 and 20 characters, ' \
-                f'you nickname length={len(email)}'
-    if not 0 <= len(password) <= 120:
-        return f'ValueError: email length must be between 8 and 120 characters, ' \
-               f'you nickname length={len(password)}'
+    # if not isinstance(nickname, str):
+    #     return f'TypeError: nickname type must be <class "str", not {type(nickname)}>'
+    # if not isinstance(email, str):
+    #     return f'TypeError: email type must be <class "str", not {type(email)}>'
+    # if not isinstance(password, str):
+    #     return f'TypeError: password type must be <class "str", not {type(password)}>'
+    # if not 3 <= len(nickname) <= 20:
+    #     return 'ValueError: nickname length must be between 3 and 20 characters, ' \
+    #            f'you nickname length={len(nickname)}'
+    # if not 5 <= len(email) <= 20:
+    #     return 'ValueError: email length must be between 5 and 20 characters, ' \
+    #             f'you nickname length={len(email)}'
+    # if not 0 <= len(password) <= 120:
+    #     return f'ValueError: email length must be between 8 and 120 characters, ' \
+    #            f'you nickname length={len(password)}'
 
     try:
         # Check the availability of the name
@@ -123,7 +132,7 @@ def add_new_user(nickname: str, email: str, password: str) -> str:
         return user_id
 
     except Exception as error:
-        print(error)
+        app.logger.error(f"location:'add_new_user', error: {error}")
         return 'ServerError: Something went wrong'
 
 
@@ -136,7 +145,7 @@ def delete_user(nickname: str) -> bool:
         db.session.commit()
         return True
     except Exception as error:
-        print(f"error {error}")
+        app.logger.error(f"location:'delete_user', error: {error}")
         return False
 
 
@@ -152,9 +161,6 @@ def get_genre(genre: str = None, genre_id: int = None) -> str:
     """
 
     if genre is not None:
-        if not isinstance(genre, str):
-            raise TypeError(f'Type genre must bi <class "str"> not {type(genre)}')
-
         genre_id = Genres.query.filter_by(genre_name=str(genre)).first()
 
         if genre_id is None:
@@ -164,8 +170,8 @@ def get_genre(genre: str = None, genre_id: int = None) -> str:
         return genre_id.genre_id
 
     if genre_id is not None:
-        if not isinstance(genre, str):
-            raise TypeError(f'Type genre must bi <class "int"> not {type(genre)}')
+        # if not isinstance(genre, str):
+        #     raise TypeError(f'Type genre must bi <class "int"> not {type(genre)}')
 
         genre_id = Genres.get(genre_id)
 
@@ -180,12 +186,12 @@ def add_new_genre(genre: str) -> str:
     If there is an error in user input, it returns an exception with a description of the error."""
 
     # Check correct input
-    if not isinstance(genre, str):
-        return f'TypeError: genre type must be <class "str", not {type(genre)}>'
-
-    if not 2 <= len(genre) <= 20:
-        return 'ValueError: genre length must be between 2 and 20 characters, ' \
-               f'you genre length={len(genre)}'
+    # if not isinstance(genre, str):
+    #     return f'TypeError: genre type must be <class "str", not {type(genre)}>'
+    #
+    # if not 2 <= len(genre) <= 20:
+    #     return 'ValueError: genre length must be between 2 and 20 characters, ' \
+    #            f'you genre length={len(genre)}'
 
     try:
         # if get_genre(genre=genre) is not None:
@@ -201,7 +207,8 @@ def add_new_genre(genre: str) -> str:
         return genre_id
 
     except Exception as error:
-        print(error)
+        app.logger.error(f"location:'add_new_genre', error: {error}")
+        return False
 
 
 def get_director(name: str = None, director_id: int = None) -> str:
@@ -216,8 +223,8 @@ def get_director(name: str = None, director_id: int = None) -> str:
     Output: str - genre_id in table genres.genre_id
     """
     if name is not None:
-        if not isinstance(name, str):
-            raise TypeError(f'Type name must be <class "str"> not {type(name)}')
+        # if not isinstance(name, str):
+        #     raise TypeError(f'Type name must be <class "str"> not {type(name)}')
 
         dir_id = Directors.query.filter_by(name=name).first()
 
@@ -227,8 +234,8 @@ def get_director(name: str = None, director_id: int = None) -> str:
         return dir_id.director_id
 
     if director_id is not None:
-        if not isinstance(director_id, int):
-            raise TypeError(f'Type director_id must be <class "int"> not {type(director_id)}')
+        # if not isinstance(director_id, int):
+        #     raise TypeError(f'Type director_id must be <class "int"> not {type(director_id)}')
 
         dir_id = Directors.get(director_id)
 
@@ -243,12 +250,12 @@ def add_new_director(name: str) -> str:
     If there is an error in user input, it returns an exception with a description of the error."""
 
     # Check correct input
-    if not isinstance(name, str):
-        return f'TypeError: nickname type must be <class "str", not {type(name)}>'
-
-    if not 2 <= len(name) <= 40:
-        return 'ValueError: nickname length must be between 2 and 40 characters, ' \
-               f'you nickname length={len(name)}'
+    # if not isinstance(name, str):
+    #     return f'TypeError: nickname type must be <class "str", not {type(name)}>'
+    #
+    # if not 2 <= len(name) <= 40:
+    #     return 'ValueError: nickname length must be between 2 and 40 characters, ' \
+    #            f'you nickname length={len(name)}'
 
     try:
         if get_director(name) is not None:
@@ -263,7 +270,8 @@ def add_new_director(name: str) -> str:
         return str(dir_id)
 
     except Exception as error:
-        print(error)
+        app.logger.error(f"location:'add_new_director', error: {error}")
+
 
 
 def get_rated(rated: str = None, rated_id: int = None) -> str:
@@ -277,16 +285,16 @@ def get_rated(rated: str = None, rated_id: int = None) -> str:
     Output: rated: str - rated in table rateds.rated
     """
     if rated is not None:
-        if not isinstance(rated, str):
-            raise TypeError(f'Type genre must bi <class "str"> not {type(rated)}')
+        # if not isinstance(rated, str):
+        #     raise TypeError(f'Type genre must bi <class "str"> not {type(rated)}')
 
         res_rated = Rateds.query.filter_by(rated=rated).first()
 
         return str(res_rated.rated_id)
 
     if rated_id is not None:
-        if not isinstance(rated, str):
-            raise TypeError(f'Type rated must bi <class "int"> not {type(rated)}')
+        # if not isinstance(rated, str):
+        #     raise TypeError(f'Type rated must bi <class "int"> not {type(rated)}')
 
         res_rated = Rateds.get(rated_id)
 
@@ -301,12 +309,12 @@ def add_new_rated(rated: str) -> str:
     If there is an error in user input, it returns an exception with a description of the error."""
 
     # Check correct input
-    if not isinstance(rated, str):
-        return f'TypeError: rated type must be <class "str", not {type(rated)}>'
-
-    if not 1 <= len(rated) >= 20:
-        return 'ValueError: rated length must be between 1 and 20 characters, ' \
-               f'you nickname length={len(rated)}'
+    # if not isinstance(rated, str):
+    #     return f'TypeError: rated type must be <class "str", not {type(rated)}>'
+    #
+    # if not 1 <= len(rated) >= 20:
+    #     return 'ValueError: rated length must be between 1 and 20 characters, ' \
+    #            f'you nickname length={len(rated)}'
 
     try:
         if get_rated(rated=rated) is not None:
@@ -321,7 +329,8 @@ def add_new_rated(rated: str) -> str:
         return res_rated
 
     except Exception as error:
-        print(error)
+        app.logger.error(f"location:'add_new_rated', error: {error}")
+        return False
 
     finally:
         return 'ServerError: Something went wrong'
@@ -347,9 +356,9 @@ def get_film(film_name: str = None, film_id: int = None) -> list:
         or
     Output: rated: str - rated in table rateds.rated
     """
-    if film_name is not None:
-        if not isinstance(film_name, str):
-            return f'TypeError: Type film_name must be <class "str"> not {type(film_name)}'
+    # if film_name is not None:
+    #     if not isinstance(film_name, str):
+    #         return f'TypeError: Type film_name must be <class "str"> not {type(film_name)}'
 
     # films = Films.query.filter(literal('e').contains(Films.film_name)).first()
 
@@ -501,37 +510,39 @@ def add_new_film(imdb_id: str, film_name: str, rated: str, poster_url: str,
     with a description of the error."""
 
     # Check correct input
-    if not isinstance(imdb_id, str):
-        return f'TypeError: imdb_id type must be <class "str", not {type(imdb_id)}>'
-    if not isinstance(film_name, str):
-        return f'TypeError: film_name type must be <class "str", not {type(film_name)}>'
-    if not isinstance(rated, str):
-        return f'TypeError: rated type must be <class "str", not {type(rated)}>'
-    if not isinstance(poster_url, str):
-        return 'TypeError: poster_url type must be <class "str", ' \
-               f'not {type(poster_url)}>'
-    if not isinstance(release_date, str):
-        return 'TypeError: release_date type must be <class "str",' \
-               f' not {type(release_date)}>'
-    if not isinstance(rating, float):
-        return 'TypeError: rating type must be <class "float", ' \
-               f'not {type(rating)}>'
-    if not isinstance(description, str):
-        return 'TypeError: description type must be <class "str", ' \
-               f'not {type(description)}>'
-    if not isinstance(user_added, int):
-        return 'TypeError: user_added type must be <class "int", ' \
-               f'not {type(user_added)}>'
-    if not isinstance(genre, list):
-        return 'TypeError: genre type must be <class "list", ' \
-               f'not {type(genre)}>'
-    if not isinstance(director, list):
-        return 'TypeError: director type must be <class "list", ' \
-               f'not {type(director)}>'
+    # if not isinstance(imdb_id, str):
+    #     return f'TypeError: imdb_id type must be <class "str", not {type(imdb_id)}>'
+    # if not isinstance(film_name, str):
+    #     return f'TypeError: film_name type must be <class "str", not {type(film_name)}>'
+    # if not isinstance(rated, str):
+    #     return f'TypeError: rated type must be <class "str", not {type(rated)}>'
+    # if not isinstance(poster_url, str):
+    #     return 'TypeError: poster_url type must be <class "str", ' \
+    #            f'not {type(poster_url)}>'
+    # if not isinstance(release_date, str):
+    #     return 'TypeError: release_date type must be <class "str",' \
+    #            f' not {type(release_date)}>'
+    # if not isinstance(rating, float):
+    #     return 'TypeError: rating type must be <class "float", ' \
+    #            f'not {type(rating)}>'
+    # if not isinstance(description, str):
+    #     return 'TypeError: description type must be <class "str", ' \
+    #            f'not {type(description)}>'
+    # if not isinstance(user_added, int):
+    #     return 'TypeError: user_added type must be <class "int", ' \
+    #            f'not {type(user_added)}>'
+    # if not isinstance(genre, list):
+    #     return 'TypeError: genre type must be <class "list", ' \
+    #            f'not {type(genre)}>'
+    # if not isinstance(director, list):
+    #     return 'TypeError: director type must be <class "list", ' \
+    #            f'not {type(director)}>'
 
     try:
         if get_film_id(film_name=film_name.lstrip().rstrip()) is not None:
-            return 'This film already exists'
+            error = 'This film already exists'
+            app.logger.error(f"location:'add_new_film', error: {error}")
+            return error
 
         # get rated_id by rated name
         rated_name = int(get_rated(rated=rated))
@@ -586,7 +597,8 @@ def add_new_film(imdb_id: str, film_name: str, rated: str, poster_url: str,
         return res_rated
 
     except Exception as error:
-        print(error)
+        app.logger.error(f"location:'add_new_film', error: {error}")
+        return False
 
 
 def update_film(film_id: int = None, imdb_id: str = None,
@@ -633,7 +645,8 @@ def update_film(film_id: int = None, imdb_id: str = None,
             db.session.commit()
             status = True
         except Exception as error:
-            print(error)
+            app.logger.error(f"location:'update_film', error: {error}")
+
 
     return status
 

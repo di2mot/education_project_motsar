@@ -10,10 +10,11 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_login import LoginManager
 from flask_restx import Api
-from config import Config
+from config import DBconfig
 
 # Create Flask app
 app = Flask(__name__)
+app.debug = True
 # for resources
 api = Api(app, version="1.0", title="FilmBook API", description="A simple API")
 
@@ -23,7 +24,7 @@ login_manager.init_app(app)
 
 
 # DB config
-app.config.from_object(Config)
+app.config.from_object(DBconfig)
 
 # init SQLAlchemy
 db = SQLAlchemy(app)
@@ -34,3 +35,5 @@ migrate = Migrate(app, db)
 # Import routes and models
 from filmBook import routes, models
 from filmBook.app_models import auth
+from utils import applogger
+

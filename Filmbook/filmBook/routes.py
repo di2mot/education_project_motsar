@@ -8,7 +8,7 @@
 from flask import request, jsonify
 from flask_login import current_user, login_user, login_required, logout_user
 from flask_restx import Resource
-from filmBook import api, db_core, login_manager
+from filmBook import api, db_core, app
 from filmBook import resources
 
 
@@ -22,6 +22,13 @@ class FilmRout(Resource):
         """http://127.0.0.1:5000/films?page=1&name=a&genre=Drama&
         rel_start=1980&rel_fin=2020&director=Christopher Nolan"""
         message = resources.films_get_parser.parse_args()
+
+        if current_user.is_anonymous:
+            id = None
+        else:
+            id = current_user.id
+
+        app.logger.info(f"location:'/add_film', user_id={id}, message: {message}")
 
         res = db_core.get_full_film_info(
                                          film_name=message['name'],
@@ -41,6 +48,7 @@ class FilmRout(Resource):
         del_films_parser.add_argument('film_id', type=int)
         message = del_films_parser.parse_args()
         id = current_user.id
+        app.logger.info(f"user_id={id}, message: {message}")
         return db_core.delete_film(film_id=message['film_id'], user_id=id)
 
 
@@ -54,6 +62,7 @@ class AddFilmRout(Resource):
         message = resources.add_films_post_parser.parse_args()
 
         id = current_user.id
+        app.logger.info(f"location:'/add_film', user_id={id}, message: {message}")
         res = db_core.add_new_film(
                                         imdb_id=message["imdb_id"],
                                         film_name=message["film_name"],
@@ -76,6 +85,7 @@ class AddFilmRout(Resource):
         message = resources.update_films_parser.parse_args()
 
         id = current_user.id
+        app.logger.info(f"location:'/add_film', user_id={id}, message: {message}")
         res = db_core.update_film(
                                         film_id=message["film_id"],
                                         imdb_id=message["imdb_id"],
@@ -101,6 +111,9 @@ class DelDirector(Resource):
     def delete(self):
         id = current_user.id
         message = resources.dir_name_parser.parse_args()
+
+        app.logger.info(f"location:'/director', user_id={id}, message: {message}")
+
         res = db_core.delete_directors(director_name=message['name'], user_id=id)
 
         return res
@@ -112,6 +125,7 @@ class UserRegistration(Resource):
     def post(self):
 
         message = resources.add_user_post_parser.parse_args()
+        app.logger.info(f"location:'/registration', user_id={None}, message: {message}")
         res = db_core.add_new_user(
                                     nickname=message['nickname'],
                                     email=message['email'],
@@ -127,7 +141,7 @@ class UserLogin(Resource):
     def post(self):
 
         message = resources.login_user_post_parser.parse_args()
-
+        app.logger.info(f"location:'/login', user_id={None}, message: {message['nickname']}")
         res = db_core.get_user_auth(
                                     nickname=message['nickname'],
                                     password=message['password'])
@@ -145,5 +159,6 @@ class UserLogout(Resource):
     @api.marshal_with(resources.logout_user_model, code=200, envelope="logout")
     def post(self):
         id = current_user.id
+        app.logger.info(f"location:'/logout', user_id={id}, message: {None}")
         logout_user()
         return {"id": int(id), "status": True}
