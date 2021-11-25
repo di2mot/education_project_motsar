@@ -60,7 +60,7 @@ def get_user_auth(nickname: str, password: str) -> dict:
     if not isinstance(password, str):
         error = f'TypeError: Type "password" must be <class "str"> not {type(password)}'
 
-    user = Users.query.filter_by(nickname='admin').first()
+    user = Users.query.filter_by(nickname=nickname).first()
     if user is not None:
         if password == user.password:
             status = True
@@ -125,6 +125,19 @@ def add_new_user(nickname: str, email: str, password: str) -> str:
     except Exception as error:
         print(error)
         return 'ServerError: Something went wrong'
+
+
+def delete_user(nickname: str) -> bool:
+    """Delete user"""
+
+    try:
+        user = Users.query.filter_by(nickname=nickname).first()
+        db.session.delete(user)
+        db.session.commit()
+        return True
+    except Exception as error:
+        print(f"error {error}")
+        return False
 
 
 def get_genre(genre: str = None, genre_id: int = None) -> str:
@@ -591,36 +604,36 @@ def update_film(film_id: int = None, imdb_id: str = None,
     film = Films.query.get(film_id)
 
     if film.user_added in (1, user_added):
-
-        if imdb_id:
-            film.imdb_id = imdb_id
-        if film_name:
-            film.film_name = film_name
-        if rated:
-            film.rated = int(get_rated(rated=rated))
-        if poster_url:
-            film.poster_url = poster_url
-        if release_date:
-            film.release_date = release_date
-        if rating:
-            film.rating = float(rating)
-        if user_added:
-            film.user_added = int(get_user_id(nickname=user_added))
-        if genre:
-            for gen in genre:
-                new_gen = int(get_genre(genre=gen))
-                gen_class = films_genres.query.filter_by(films_film_id=film_id)
-                gen_class.genres_genre_id = new_gen
-        if director:
-            for dirct in director:
-                new_dir = int(get_director(name=dirct))
-                dir_class = films_directors.query.filter_by(films_film_id=film_id)
-                dir_class.directors_director_id = new_dir
-        if description:
-            film.description = description
-        db.session.add(film)
-        db.session.commit()
-        status = True
+        try:
+            if imdb_id:
+                film.imdb_id = imdb_id
+            if film_name:
+                film.film_name = film_name
+            if rated:
+                film.rated = int(get_rated(rated=rated))
+            if poster_url:
+                film.poster_url = poster_url
+            if release_date:
+                film.release_date = release_date
+            if rating:
+                film.rating = float(rating)
+            # if genre:
+            #     for gen in genre:
+            #         new_gen = int(get_genre(genre=gen))
+            #         gen_class = films_genres.query.filter_by(films_film_id=film_id)
+            #         gen_class.genres_genre_id = new_gen
+            # if director:
+            #     for dirct in director:
+            #         new_dir = int(get_director(name=dirct))
+            #         dir_class = films_directors.query.filter_by(films_film_id=film_id)
+            #         dir_class.directors_director_id = new_dir
+            if description:
+                film.description = description
+            db.session.add(film)
+            db.session.commit()
+            status = True
+        except Exception as error:
+            print(error)
 
     return status
 
