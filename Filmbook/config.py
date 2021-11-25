@@ -7,8 +7,12 @@
 # =============================================================================
 
 
+class Config(object):
+    """Global  config"""
+    TESTING = False
 
-class Config:
+
+class DBconfig:
     """Config fo DB connection"""
 
     # For postgres
@@ -31,3 +35,18 @@ class Config:
 
     # For postgres
     SQLALCHEMY_DATABASE_URI = f'{dialect}+{driver}://{login}:{passw}@{host}/{db_name}'
+
+
+
+class ProductionConfig(Config):
+    """Configuration for flask app logger"""
+    DEBUG = False
+    LOGFILE = 'logs/Production.log'
+
+
+class DevelopmentConfig(Config):
+    """Configuration for flask app logger"""
+    DEBUG = True
+    LOGFILE = 'logs/Development.log'
+
+
