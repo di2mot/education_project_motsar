@@ -67,15 +67,16 @@ add_films_post_parser.add_argument('director', type=str, action='split', default
 add_films_post_parser.add_argument('description', type=str, default=None)
 
 
-"""For UPDATE: /add_films """
+"""For PUT: /add_films update film"""
 update_films_model = api.model(
     'films',
     {
-        'film_id': fields.Boolean(),
+        'status': fields.Boolean(),
     }
     )
 
 update_films_parser = reqparse.RequestParser(bundle_errors=True)
+update_films_parser.add_argument('film_id', type=int)
 update_films_parser.add_argument('imdb_id', type=str, default=None)
 update_films_parser.add_argument('film_name', type=str, default=None)
 update_films_parser.add_argument('rated', type=str, default=None)
@@ -85,7 +86,6 @@ update_films_parser.add_argument('rating', type=float, default=None)
 update_films_parser.add_argument('genre', type=str, action='split', default=[None])
 update_films_parser.add_argument('director', type=str, action='split', default=[None])
 update_films_parser.add_argument('description', type=str, default=None)
-
 
 
 """For delete director"""

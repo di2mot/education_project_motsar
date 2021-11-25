@@ -69,13 +69,15 @@ class AddFilmRout(Resource):
 
         return {"film_id": res}
 
-    @api.marshal_with(resources.update_films_model, code=200, envelope='new_films', as_list=True)
+    @api.marshal_with(resources.update_films_model, code=200, envelope='update_films', as_list=True)
     @login_required
-    def update(self):
+    def put(self):
+
         message = resources.update_films_parser.parse_args()
 
         id = current_user.id
         res = db_core.update_film(
+                                        film_id=message["film_id"],
                                         imdb_id=message["imdb_id"],
                                         film_name=message["film_name"],
                                         rated=message["rated"],
@@ -88,9 +90,7 @@ class AddFilmRout(Resource):
                                         description=message["description"],
                                 )
 
-        return {"film_id": res}
-
-
+        return {"status": res}
 
 
 @api.route('/director')
@@ -131,7 +131,7 @@ class UserLogin(Resource):
         res = db_core.get_user_auth(
                                     nickname=message['nickname'],
                                     password=message['password'])
-        print(res)
+        # print(res)
         if res['message']['status']:
             login_user(res['user'])
 
