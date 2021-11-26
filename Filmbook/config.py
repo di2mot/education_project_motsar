@@ -5,6 +5,7 @@
 # =============================================================================
 # Imports
 # =============================================================================
+import os
 
 
 class Config(object):
@@ -23,7 +24,7 @@ class DBconfig:
     login = "postgres"
     passw = "postgres_password"
     host = "localhost"
-
+    SQLALCHEMY_DATABASE_URI = f'{dialect}+{driver}://{login}:{passw}@{host}/{db_name}'
     # For SQLite
     # import os
     # basedir = os.path.abspath(os.path.dirname(__file__))
@@ -34,8 +35,8 @@ class DBconfig:
     SECRET_KEY = 'DEV'
 
     # For postgres
-    SQLALCHEMY_DATABASE_URI = f'{dialect}+{driver}://{login}:{passw}@{host}/{db_name}'
 
+    # SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URI')
 
 
 class ProductionConfig(Config):
