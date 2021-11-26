@@ -14,7 +14,7 @@ from config import DBconfig
 
 # Create Flask app
 app = Flask(__name__)
-app.debug = True
+# app.debug = True
 # for resources
 api = Api(app, version="1.0", title="FilmBook API", description="A simple API")
 
@@ -36,4 +36,5 @@ migrate = Migrate(app, db)
 from filmBook import routes, models
 from filmBook.app_models import auth
 from utils import applogger
+import utils.add_user
 
