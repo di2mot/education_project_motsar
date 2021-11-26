@@ -5,6 +5,7 @@
 # =============================================================================
 # Imports
 # =============================================================================
+from datetime import date
 from filmBook.models import Films
 from filmBook.models import Genres
 from filmBook.models import Rateds
@@ -13,7 +14,6 @@ from filmBook.models import Users
 from filmBook.models import films_genres
 from filmBook.models import films_directors
 from filmBook import db, app
-from datetime import date
 
 
 def get_user_id(nickname: str) -> int:
@@ -308,13 +308,6 @@ def add_new_rated(rated: str) -> str:
     Output: rated_id: str - rated_id
     If there is an error in user input, it returns an exception with a description of the error."""
 
-    # Check correct input
-    # if not isinstance(rated, str):
-    #     return f'TypeError: rated type must be <class "str", not {type(rated)}>'
-    #
-    # if not 1 <= len(rated) >= 20:
-    #     return 'ValueError: rated length must be between 1 and 20 characters, ' \
-    #            f'you nickname length={len(rated)}'
 
     try:
         if get_rated(rated=rated) is not None:
@@ -332,9 +325,6 @@ def add_new_rated(rated: str) -> str:
         app.logger.error(f"location:'add_new_rated', error: {error}")
         return False
 
-    finally:
-        return 'ServerError: Something went wrong'
-
 
 def get_film_id(film_name: str):
     """Get film by id"""
@@ -345,7 +335,7 @@ def get_film_id(film_name: str):
     return status.film_id
 
 
-def get_film(film_name: str = None, film_id: int = None) -> list:
+def get_film(film_name: str = None) -> list:
     """
     Input: str          - name of film_name from table films.film_name
         or
@@ -356,17 +346,10 @@ def get_film(film_name: str = None, film_id: int = None) -> list:
         or
     Output: rated: str - rated in table rateds.rated
     """
-    # if film_name is not None:
-    #     if not isinstance(film_name, str):
-    #         return f'TypeError: Type film_name must be <class "str"> not {type(film_name)}'
 
-    # films = Films.query.filter(literal('e').contains(Films.film_name)).first()
 
     films = Films.query.filter(Films.film_name.ilike(f'%{film_name}%')).all()
-    # films = Films.query.with_entities(
-    #         Films.film_name, Films.release_date
-    #         ).filter(Films.film_name.ilike(f'%{film_name}%')).all()
-    # films = Films.query.filter(Films.film_name.ilike(f'%{film_name}%')).paginate()
+
     return films
 
 
@@ -407,8 +390,8 @@ def get_full_film_info(film_name: str = '',
     # check directors
     if dir_list[0] is None:
         dir_list = []
-        dir = Directors.query.add_columns(Directors.name).all()
-        for element in dir:
+        direct = Directors.query.add_columns(Directors.name).all()
+        for element in direct:
             dir_list.append(element[1])
 
     # SUPER-MEGA-GIPER-UlTRA query
@@ -450,32 +433,32 @@ def get_full_film_info(film_name: str = '',
       ).add_columns(Films.film_id, Directors.name).all()
 
     # templ dicts
-    gd = dict()
-    dd = dict()
+    genr_dict = dict()
+    dir_dict = dict()
 
-    # Add directors and genres to the dictionary gd and dd
-    for i in all_genre:
-        if i[0] not in gd:
-            gd[i[0]] = []
-        gd[i[0]].append(i[2])
+    # Add directors and genres to the dictionary genr_dict and dir_dict
+    for list_index in all_genre:
+        if list_index[0] not in genr_dict:
+            genr_dict[list_index[0]] = []
+        genr_dict[list_index[0]].append(list_index[2])
 
-    for i in all_direcotrs:
-        if i[0] not in dd:
-            dd[i[0]] = []
-        if i[2] is not None:
-            dd[i[0]].append(i[2])
+    for list_index in all_direcotrs:
+        if list_index[0] not in dir_dict:
+            dir_dict[list_index[0]] = []
+        if list_index[2] is not None:
+            dir_dict[list_index[0]].append(list_index[2])
         else:
-            dd[i[0]].append('unknown')
+            dir_dict[list_index[0]].append('unknown')
 
     all_films = all_films.items
 
-    for i, x in enumerate(all_films):
-        x = list(x)
-        all_films[i] = x
-        all_films[i].append(','.join(gd[x[0]]))
-        all_films[i].append(','.join(dd[x[0]]))
-        a = all_films[i]
-        all_films[i] = a
+    for list_index, value in enumerate(all_films):
+        value = list(value)
+        all_films[list_index] = value
+        all_films[list_index].append(','.join(genr_dict[value[0]]))
+        all_films[list_index].append(','.join(dir_dict[value[0]]))
+        temp_res = all_films[list_index]
+        all_films[list_index] = temp_res
 
     new_list = []
     for element in all_films:
@@ -486,7 +469,7 @@ def get_full_film_info(film_name: str = '',
 
 def add_new_film(imdb_id: str, film_name: str, rated: str, poster_url: str,
                  release_date: str, rating: float, user_added: int,
-                 genre: list[str], director: list[str], description: str = 'None',) -> str:
+                 genre: list, director: list, description: str = 'None',) -> str:
     """Inputs:
     imdb_id: str        - id of film from imdb
     film_name: str      - name of films, length must be between 1 and unlimited.
@@ -605,7 +588,6 @@ def update_film(film_id: int = None, imdb_id: str = None,
                 film_name: str = None, rated: str = None,
                 poster_url: str = None, release_date: str = None,
                 rating: float = None, user_added: str = None,
-                genre: list[str] = None, director: list[str] = None,
                 description: str = 'None') -> bool:
 
     """Update information about the film"""
@@ -629,16 +611,6 @@ def update_film(film_id: int = None, imdb_id: str = None,
                 film.release_date = release_date
             if rating:
                 film.rating = float(rating)
-            # if genre:
-            #     for gen in genre:
-            #         new_gen = int(get_genre(genre=gen))
-            #         gen_class = films_genres.query.filter_by(films_film_id=film_id)
-            #         gen_class.genres_genre_id = new_gen
-            # if director:
-            #     for dirct in director:
-            #         new_dir = int(get_director(name=dirct))
-            #         dir_class = films_directors.query.filter_by(films_film_id=film_id)
-            #         dir_class.directors_director_id = new_dir
             if description:
                 film.description = description
             db.session.add(film)

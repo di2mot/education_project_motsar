@@ -38,6 +38,12 @@ films_get_parser.add_argument('rel_start', type=int, default=1900)
 films_get_parser.add_argument('rel_fin', type=int, default=2100)
 films_get_parser.add_argument('order', type=str, default=None)
 
+
+"""For DELETE: /film """
+del_films_parser = api.parser()
+del_films_parser.add_argument('film_id', type=int)
+
+
 """For DELETE: /films """
 delete_films_model = api.model(
     'films',
