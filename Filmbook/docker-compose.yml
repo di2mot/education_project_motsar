@@ -5,8 +5,10 @@ services:
       image: postgres:14.0
       restart: always
       environment:
+
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres_password
+
           PGDATA: /var/lib/postgresql/data
       volumes:
           - db-data:/var/lib/postgresql/data
@@ -16,7 +18,9 @@ services:
     build: .
     restart: on-failure
     environment:
+
       DATABASE_URI: postgresql+psycopg2://postgres:postgres_password@db:5432/filmbook
+
     volumes:
       - .:/app
     ports:

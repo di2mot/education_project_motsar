@@ -8,10 +8,10 @@ For run app into the Docker run:
 
 `docker-compose --env-file ./.env.list up -d`
 
-next, run:
 
 
 `docker-compose --env-file ./.env.list exec db psql -U postgres -c "CREATE DATABASE filmbook;` 
+
 
 To make mirgation run:
 
